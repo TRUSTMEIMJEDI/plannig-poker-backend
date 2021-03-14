@@ -76,10 +76,15 @@ public class RoomController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-//    @DeleteMapping("/{key}/user/{name}")
-//    public void removeUserFromRoom(@PathVariable String key, @PathVariable String name) {
-//        roomCacheManager.removeUserFromRoom(key, name);
-//    }
+    @CrossOrigin(origins = "*")
+    @PostMapping("/leaveRoom")
+    public ResponseEntity<?> leaveRoom(@RequestBody RoomAndUserRequest roomAndUserRequest) {
+        String roomKey = roomAndUserRequest.getRoomKey();
+        Room room = roomCacheManager.leaveRoom(roomKey, roomAndUserRequest.getUserKey());
+        List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
+        this.template.convertAndSend("/room/" + roomKey, users);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 
 //    @GetMapping("/createRoom/{name}")
 //    public String addUserToRoom(@PathVariable String name) {

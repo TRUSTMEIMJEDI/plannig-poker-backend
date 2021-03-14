@@ -5,6 +5,8 @@ import com.marcinfriedrich.planningpoker.model.Room;
 import com.marcinfriedrich.planningpoker.model.User;
 import com.marcinfriedrich.planningpoker.payload.KeyResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RoomCacheManager {
@@ -22,6 +24,15 @@ public class RoomCacheManager {
         }
 
         return instance;
+    }
+
+    public synchronized List<Room> getRooms() {
+        List<Room> rooms = new ArrayList<>();
+        cache.forEach((key, val) -> {
+            rooms.add((Room) val);
+        });
+
+        return rooms;
     }
 
     public synchronized KeyResponse createRoom(String roomName, String userName) {
@@ -48,9 +59,10 @@ public class RoomCacheManager {
         return room;
     }
 
-    public synchronized void removeUserFromRoom(String key, String name) {
-        Room room = (Room) cache.get(key);
-        room.removeUserByName(name);
+    public synchronized Room leaveRoom(String roomKey, String userKey) {
+        Room room = (Room) cache.get(roomKey);
+        room.removeUserByKey(userKey);
+        return room;
     }
 
     public synchronized void deleteRoom(String key, String name) {
@@ -63,6 +75,10 @@ public class RoomCacheManager {
         if (user != null && user.isOwner()) {
             cache.remove(key);
         }
+    }
+
+    public synchronized void deleteRoom(String key) {
+        cache.remove(key);
     }
 
     public synchronized void setUserSize(String roomKey, String userKey, Size size) {

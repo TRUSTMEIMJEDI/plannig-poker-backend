@@ -27,6 +27,13 @@ public class Room {
 
     }
 
+    public void removeUserByKey(String key) {
+        users.stream()
+                .filter(u -> key.equals(u.getKey()))
+                .findAny().ifPresent(user -> users.remove(user));
+
+    }
+
     public User getUserByName(String name) {
         return users.stream()
                 .filter(u -> name.equals(u.getName()))
