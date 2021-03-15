@@ -7,12 +7,17 @@ import com.marcinfriedrich.planningpoker.payload.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api")
 public class RoomController {
 
     private RoomCacheManager roomCacheManager;
@@ -84,6 +89,16 @@ public class RoomController {
         List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
         this.template.convertAndSend("/room/" + roomKey, users);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @Scheduled(cron = "0 0 16 * * MON-FRI")
+    public void removeUnusedRooms() {
+        List<Room> rooms = roomCacheManager.getRooms();
+        LocalDate now = LocalDate.now().plusDays(1);
+        rooms = rooms.stream().filter(room -> room.getCreatedAt().isAfter(now)).collect(Collectors.toList());
+        rooms.forEach(room -> {
+            roomCacheManager.deleteRoom(room.getKey());
+        });
     }
 
 //    @GetMapping("/createRoom/{name}")

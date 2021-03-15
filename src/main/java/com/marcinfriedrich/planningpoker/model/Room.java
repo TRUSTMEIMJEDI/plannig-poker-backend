@@ -2,6 +2,7 @@ package com.marcinfriedrich.planningpoker.model;
 
 import com.marcinfriedrich.planningpoker.util.RandomUtil;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +10,13 @@ public class Room {
     private final String name;
     private final String key;
     private List<User> users;
+    private LocalDate createdAt;
 
     public Room(String name) {
         this.name = name;
         this.users = new ArrayList<>();
         this.key = RandomUtil.generateRoomKey();
+        this.createdAt = LocalDate.now();
     }
 
     public void addUser(User user) {
@@ -58,5 +61,9 @@ public class Room {
 
     public String getKey() {
         return key;
+    }
+
+    public LocalDate getCreatedAt() {
+        return createdAt;
     }
 }
