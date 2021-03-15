@@ -10,9 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,8 +18,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class RoomController {
 
-    private RoomCacheManager roomCacheManager;
     private final SimpMessagingTemplate template;
+    private final RoomCacheManager roomCacheManager;
 
     public RoomController(SimpMessagingTemplate template) {
         this.template = template;
