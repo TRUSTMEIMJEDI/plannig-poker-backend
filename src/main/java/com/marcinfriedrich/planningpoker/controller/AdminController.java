@@ -3,10 +3,7 @@ package com.marcinfriedrich.planningpoker.controller;
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
 import com.marcinfriedrich.planningpoker.model.Room;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class AdminController {
 
     private RoomCacheManager roomCacheManager;
