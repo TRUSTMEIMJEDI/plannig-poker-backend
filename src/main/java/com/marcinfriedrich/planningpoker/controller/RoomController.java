@@ -85,7 +85,13 @@ public class RoomController {
         String roomKey = roomAndUserRequest.getRoomKey();
         Room room = roomCacheManager.leaveRoom(roomKey, roomAndUserRequest.getUserKey());
         List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
-        this.template.convertAndSend("/room/" + roomKey, users);
+
+        if (users.isEmpty()) {
+            roomCacheManager.deleteRoom(roomKey);
+        } else {
+            this.template.convertAndSend("/room/" + roomKey, users);
+        }
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
