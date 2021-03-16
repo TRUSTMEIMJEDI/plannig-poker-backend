@@ -2,7 +2,9 @@ package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
 import com.marcinfriedrich.planningpoker.model.Room;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -14,9 +16,11 @@ import java.util.List;
 @RequestMapping("/api")
 public class AdminController {
 
-    private RoomCacheManager roomCacheManager;
+    private final RoomCacheManager roomCacheManager;
+    private final SimpMessagingTemplate template;
 
-    public AdminController() {
+    public AdminController(SimpMessagingTemplate template) {
+        this.template = template;
         this.roomCacheManager = RoomCacheManager.getInstance();
     }
 
@@ -57,6 +61,7 @@ public class AdminController {
         String passwordToMatch = formatter.format(dateNow);
         if (password.equals(passwordToMatch)) {
             roomCacheManager.deleteRoom(loginRequest.getRoomKey());
+            this.template.convertAndSend("/room/" + loginRequest.getRoomKey(), new ArrayList<>());
             return ResponseEntity.ok(roomCacheManager.getRooms());
         } else {
             return ResponseEntity.ok(new ArrayList<>());
