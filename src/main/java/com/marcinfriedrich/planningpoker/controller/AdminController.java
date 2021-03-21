@@ -2,7 +2,6 @@ package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
 import com.marcinfriedrich.planningpoker.model.Room;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -59,6 +58,7 @@ public class AdminController {
         LocalDate dateNow = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         String passwordToMatch = formatter.format(dateNow);
+
         if (password.equals(passwordToMatch)) {
             roomCacheManager.deleteRoom(loginRequest.getRoomKey());
             this.template.convertAndSend("/room/" + loginRequest.getRoomKey(), new ArrayList<>());
