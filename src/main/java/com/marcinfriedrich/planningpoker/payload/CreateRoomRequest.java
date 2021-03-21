@@ -1,6 +1,7 @@
 package com.marcinfriedrich.planningpoker.payload;
 
 public class CreateRoomRequest {
+
     private String roomName;
     private String userName;
 

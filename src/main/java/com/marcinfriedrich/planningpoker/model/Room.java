@@ -30,6 +30,11 @@ public class Room {
 
     }
 
+    public boolean isNameTaken(String name) {
+        return users.stream()
+                .anyMatch(user -> name.equals(user.getName()));
+    }
+
     public void removeUserByKey(String key) {
         users.stream()
                 .filter(u -> key.equals(u.getKey()))

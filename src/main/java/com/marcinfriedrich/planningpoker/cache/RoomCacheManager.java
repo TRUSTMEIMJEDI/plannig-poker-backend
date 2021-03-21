@@ -1,6 +1,8 @@
 package com.marcinfriedrich.planningpoker.cache;
 
 import com.marcinfriedrich.planningpoker.enums.Size;
+import com.marcinfriedrich.planningpoker.exception.NameIsTakenException;
+import com.marcinfriedrich.planningpoker.exception.NoRoomException;
 import com.marcinfriedrich.planningpoker.model.Room;
 import com.marcinfriedrich.planningpoker.model.User;
 import com.marcinfriedrich.planningpoker.payload.KeyResponse;
@@ -45,15 +47,24 @@ public class RoomCacheManager {
         String userKey = user.getKey();
         cache.put(roomKey, room);
 
-        return new KeyResponse(roomKey, userKey, roomName, userName);
+        return new KeyResponse(roomKey, userKey, roomName, userName, false);
     }
 
     public synchronized Room getRoom(String key) {
         return (Room) cache.get(key);
     }
 
-    public synchronized Room joinRoom(String key, User user) {
+    public synchronized Room joinRoom(String key, User user) throws NameIsTakenException, NoRoomException {
         Room room = (Room) cache.get(key);
+
+        if (room == null) {
+            throw new NoRoomException();
+        }
+
+        if (room.isNameTaken(user.getName())) {
+            throw new NameIsTakenException();
+        }
+
         room.addUser(user);
 
         return room;

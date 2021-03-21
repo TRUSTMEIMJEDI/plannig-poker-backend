@@ -9,6 +9,7 @@ public class User {
     private Size size;
     private boolean answer;
     private boolean owner = false;
+    private boolean observer = false;
 
     public User(String name) {
         this.key = RandomUtil.generateUserKey();
@@ -51,5 +52,13 @@ public class User {
 
     public void setAnswer(boolean answer) {
         this.answer = answer;
+    }
+
+    public boolean isObserver() {
+        return observer;
+    }
+
+    public void setObserver(boolean observer) {
+        this.observer = observer;
     }
 }

@@ -4,14 +4,17 @@ import com.marcinfriedrich.planningpoker.enums.Size;
 import com.marcinfriedrich.planningpoker.model.User;
 
 public class UserFullResponse {
+
     private final String name;
     private final boolean answer;
+    private final boolean observer;
     private final Size size;
 
     public UserFullResponse(User user) {
-        this.name = user.getName();
-        this.answer = user.isAnswer();
-        this.size = user.getSize();
+        name = user.getName();
+        answer = user.isAnswer();
+        size = user.getSize();
+        observer = user.isObserver();
     }
 
     public String getName() {
@@ -25,4 +28,9 @@ public class UserFullResponse {
     public Size getSize() {
         return size;
     }
+
+    public boolean isObserver() {
+        return observer;
+    }
+
 }

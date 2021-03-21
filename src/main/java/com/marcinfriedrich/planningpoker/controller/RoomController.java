@@ -1,6 +1,7 @@
 package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
+import com.marcinfriedrich.planningpoker.exception.JsonExceptionHandler;
 import com.marcinfriedrich.planningpoker.model.Room;
 import com.marcinfriedrich.planningpoker.model.User;
 import com.marcinfriedrich.planningpoker.payload.*;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class RoomController {
 
     private final SimpMessagingTemplate template;
@@ -30,15 +32,21 @@ public class RoomController {
     @GetMapping("/{key}/users")
     public List<UserAnswerResponse> getUsersFromRoom(@PathVariable String key) {
         Room room = roomCacheManager.getRoom(key);
-        return room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
+
+        return room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
     }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{key}/reveal")
     public ResponseEntity<?> getAnswers(@PathVariable String key) {
         Room room = roomCacheManager.getRoom(key);
-        List<UserFullResponse> users = room.getUsers().stream().map(UserFullResponse::new).collect(Collectors.toList());
-        this.template.convertAndSend("/room/" + key + "/reveal", users);
+        List<UserFullResponse> users = room.getUsers().stream()
+                .map(UserFullResponse::new)
+                .collect(Collectors.toList());
+        template.convertAndSend("/room/" + key + "/reveal", users);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -47,19 +55,34 @@ public class RoomController {
     public ResponseEntity<?> clean(@PathVariable String key) {
         roomCacheManager.clean(key);
         Room room = roomCacheManager.getRoom(key);
-        List<UserFullResponse> users = room.getUsers().stream().map(UserFullResponse::new).collect(Collectors.toList());
-        this.template.convertAndSend("/room/" + key + "/reveal", users);
+        List<UserFullResponse> users = room.getUsers()
+                .stream()
+                .map(UserFullResponse::new)
+                .collect(Collectors.toList());
+        template.convertAndSend("/room/" + key + "/reveal", users);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping("/{key}/{name}")
-    public KeyResponse joinRoom(@PathVariable String key, @PathVariable String name) {
+    @PostMapping("/{key}/{name}/{isObserver}")
+    public ResponseEntity joinRoom(@PathVariable String key, @PathVariable String name, @PathVariable Boolean isObserver) {
         User user = new User(name);
-        Room room = roomCacheManager.joinRoom(key, user);
-        List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
-        this.template.convertAndSend("/room/" + key, users);
-        return new KeyResponse(key, user.getKey(), room.getName(), name);
+        user.setObserver(isObserver);
+        Room room;
+
+        try {
+            room = roomCacheManager.joinRoom(key, user);
+        } catch (Exception e) {
+            return new JsonExceptionHandler().handleAllOtherErrors(e);
+        }
+
+        List<UserAnswerResponse> users = room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
+        template.convertAndSend("/room/" + key, users);
+
+        return new ResponseEntity(new KeyResponse(key, user.getKey(), room.getName(), name, isObserver), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
@@ -74,8 +97,11 @@ public class RoomController {
         String roomKey = answerRequest.getRoomKey();
         roomCacheManager.setUserSize(roomKey, answerRequest.getUserKey(), answerRequest.getSize());
         Room room = roomCacheManager.getRoom(roomKey);
-        List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
-        this.template.convertAndSend("/room/" + roomKey, users);
+        List<UserAnswerResponse> users = room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
+        template.convertAndSend("/room/" + roomKey, users);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -84,7 +110,9 @@ public class RoomController {
     public ResponseEntity<?> leaveRoom(@RequestBody RoomAndUserRequest roomAndUserRequest) {
         String roomKey = roomAndUserRequest.getRoomKey();
         Room room = roomCacheManager.leaveRoom(roomKey, roomAndUserRequest.getUserKey());
-        List<UserAnswerResponse> users = room.getUsers().stream().map(UserAnswerResponse::new).collect(Collectors.toList());
+        List<UserAnswerResponse> users = room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
 
         if (users.isEmpty()) {
             roomCacheManager.deleteRoom(roomKey);
@@ -99,10 +127,10 @@ public class RoomController {
     public void removeUnusedRooms() {
         List<Room> rooms = roomCacheManager.getRooms();
         LocalDate now = LocalDate.now().plusDays(1);
-        rooms = rooms.stream().filter(room -> room.getCreatedAt().isAfter(now)).collect(Collectors.toList());
-        rooms.forEach(room -> {
-            roomCacheManager.deleteRoom(room.getKey());
-        });
+        rooms = rooms.stream()
+                .filter(room -> room.getCreatedAt().isAfter(now))
+                .collect(Collectors.toList());
+        rooms.forEach(room -> roomCacheManager.deleteRoom(room.getKey()));
     }
 
 //    @GetMapping("/createRoom/{name}")

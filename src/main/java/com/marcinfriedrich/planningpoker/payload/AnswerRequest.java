@@ -3,6 +3,7 @@ package com.marcinfriedrich.planningpoker.payload;
 import com.marcinfriedrich.planningpoker.enums.Size;
 
 public class AnswerRequest {
+
     private String roomKey;
     private String userKey;
     private Size size;
