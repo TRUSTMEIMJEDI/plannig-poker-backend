@@ -8,6 +8,10 @@ public final class RandomUtil {
     private static final int DEF_COUNT = 5;
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
+    static {
+        SECURE_RANDOM.nextBytes(new byte[64]);
+    }
+
     private RandomUtil() {
     }
 
@@ -20,10 +24,6 @@ public final class RandomUtil {
     }
 
     private static String generateRandomAlphanumericString(int count) {
-        return RandomStringUtils.random(count, 0, 0, true, true, (char[])null, SECURE_RANDOM);
-    }
-
-    static {
-        SECURE_RANDOM.nextBytes(new byte[64]);
+        return RandomStringUtils.random(count, 0, 0, true, true, null, SECURE_RANDOM);
     }
 }

@@ -2,7 +2,7 @@ package com.marcinfriedrich.planningpoker.exception;
 
 public class ErrorResponse {
 
-    private String message;
+    private final String message;
 
     public ErrorResponse(String message) {
         this.message = message;

@@ -9,8 +9,8 @@ import java.util.List;
 public class Room {
     private final String name;
     private final String key;
-    private List<User> users;
-    private LocalDate createdAt;
+    private final List<User> users;
+    private final LocalDate createdAt;
 
     public Room(String name) {
         this.name = name;
