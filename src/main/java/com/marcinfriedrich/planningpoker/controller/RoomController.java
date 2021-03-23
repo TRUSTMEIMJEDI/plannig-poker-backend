@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class RoomController {
 
     private final SimpMessagingTemplate template;
@@ -66,7 +65,7 @@ public class RoomController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/{key}/{name}/{isObserver}")
-    public ResponseEntity joinRoom(@PathVariable String key, @PathVariable String name, @PathVariable Boolean isObserver) {
+    public ResponseEntity<?> joinRoom(@PathVariable String key, @PathVariable String name, @PathVariable Boolean isObserver) {
         User user = new User(name);
         user.setObserver(isObserver);
         Room room;
@@ -82,7 +81,7 @@ public class RoomController {
                 .collect(Collectors.toList());
         template.convertAndSend("/room/" + key, users);
 
-        return new ResponseEntity(new KeyResponse(key, user.getKey(), room.getName(), name, isObserver), HttpStatus.OK);
+        return new ResponseEntity<>(new KeyResponse(key, user.getKey(), room.getName(), name, isObserver), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
