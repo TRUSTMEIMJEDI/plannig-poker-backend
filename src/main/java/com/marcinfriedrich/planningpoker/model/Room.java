@@ -26,7 +26,7 @@ public class Room {
     public void removeUserByName(String name) {
         users.stream()
                 .filter(u -> name.equals(u.getName()))
-                .findAny().ifPresent(user -> users.remove(user));
+                .findAny().ifPresent(users::remove);
 
     }
 
@@ -38,8 +38,7 @@ public class Room {
     public void removeUserByKey(String key) {
         users.stream()
                 .filter(u -> key.equals(u.getKey()))
-                .findAny().ifPresent(user -> users.remove(user));
-
+                .findAny().ifPresent(users::remove);
     }
 
     public User getUserByName(String name) {
