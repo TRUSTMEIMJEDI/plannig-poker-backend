@@ -2,8 +2,10 @@ package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
 import com.marcinfriedrich.planningpoker.exception.JsonExceptionHandler;
+import com.marcinfriedrich.planningpoker.exception.NameIsTakenException;
 import com.marcinfriedrich.planningpoker.model.Room;
 import com.marcinfriedrich.planningpoker.model.User;
+import com.marcinfriedrich.planningpoker.payload.ChangePasswordRequest;
 import com.marcinfriedrich.planningpoker.payload.KeyResponse;
 import com.marcinfriedrich.planningpoker.payload.UserAnswerResponse;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,7 @@ public class UserController {
     }
 
     @PutMapping("/{roomKey}/{userKey}/{isObserver}")
-    public ResponseEntity<KeyResponse> changeUserType(@PathVariable String roomKey, @PathVariable String userKey, @PathVariable Boolean isObserver) {
+    public ResponseEntity<KeyResponse> changeUserType(@PathVariable String roomKey, @PathVariable String userKey, @PathVariable boolean isObserver) {
         Room room = roomCacheManager.getRoom(roomKey);
         User user = room.getUserByKey(userKey);
         user.setObserver(isObserver);
@@ -38,12 +40,36 @@ public class UserController {
             user.setSize(null);
         }
 
-        List<UserAnswerResponse> users = room.getUsers().stream()
-                .map(UserAnswerResponse::new)
-                .collect(Collectors.toList());
+        List<UserAnswerResponse> users = getUserAnswerResponses(room);
         template.convertAndSend("/room/" + roomKey, users);
 
         return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(), user.getName(), isObserver), HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/change-username")
+    public ResponseEntity<?> changeUsername(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        String roomKey = changePasswordRequest.getRoomKey();
+        Room room = roomCacheManager.getRoom(roomKey);
+
+        String newUsername = changePasswordRequest.getNewUsername();
+
+        if (room.isNameTaken(newUsername)) {
+            return new JsonExceptionHandler().handleAllOtherErrors(new NameIsTakenException());
+        }
+
+        User user = room.getUserByKey(changePasswordRequest.getUserKey());
+        user.setName(newUsername);
+        List<UserAnswerResponse> users = getUserAnswerResponses(room);
+        template.convertAndSend("/room/" + roomKey, users);
+
+        return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(), user.getName(), user.isObserver()), HttpStatus.OK);
+    }
+
+    private List<UserAnswerResponse> getUserAnswerResponses(Room room) {
+        return room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
     }
 
 }
