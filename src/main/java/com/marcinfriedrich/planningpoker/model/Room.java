@@ -5,6 +5,7 @@ import com.marcinfriedrich.planningpoker.util.RandomUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Room {
     private final String name;
@@ -32,7 +33,7 @@ public class Room {
 
     public boolean isNameTaken(String name) {
         return users.stream()
-                .anyMatch(user -> name.equals(user.getName()));
+                .anyMatch(user -> name.equalsIgnoreCase(user.getName()));
     }
 
     public void removeUserByKey(String key) {

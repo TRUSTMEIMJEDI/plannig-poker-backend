@@ -146,6 +146,7 @@ public class RoomController {
                 .collect(Collectors.toList());
 
         this.template.convertAndSend("/room/" + roomKey, users);
+        this.template.convertAndSend("/room/" + roomKey + "/" + userToDelete.getName(), userToDelete.getName());
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
