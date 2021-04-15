@@ -1,6 +1,7 @@
 package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
+import com.marcinfriedrich.planningpoker.exception.ErrorResponse;
 import com.marcinfriedrich.planningpoker.exception.JsonExceptionHandler;
 import com.marcinfriedrich.planningpoker.model.Room;
 import com.marcinfriedrich.planningpoker.model.User;
@@ -118,6 +119,34 @@ public class RoomController {
         } else {
             this.template.convertAndSend("/room/" + roomKey, users);
         }
+
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("/deleteUserFromRoom")
+    public ResponseEntity<?> deleteUserFromRoom(@RequestBody DeleteUserFromRoom deleteUserFromRoom) {
+        String roomKey = deleteUserFromRoom.getRoomKey();
+        Room room = roomCacheManager.getRoom(roomKey);
+
+        boolean isAllowed = room.getUsers().stream()
+                .filter(u -> deleteUserFromRoom.getUserKey().equals(u.getKey()))
+                .findFirst()
+                .orElse(null) != null;
+
+        if (!isAllowed) {
+            return new JsonExceptionHandler().handleAllOtherErrors(new Exception("Nie można usunąć tego użytkownika."));
+        }
+
+        User userToDelete = room.getUserByName(deleteUserFromRoom.getUserNameToDelete());
+        roomCacheManager.leaveRoom(roomKey, userToDelete.getKey());
+
+        List<UserAnswerResponse> users = room.getUsers().stream()
+                .map(UserAnswerResponse::new)
+                .collect(Collectors.toList());
+
+        this.template.convertAndSend("/room/" + roomKey, users);
+        this.template.convertAndSend("/room/" + roomKey + "/" + userToDelete.getName(), userToDelete.getName());
 
         return ResponseEntity.ok(HttpStatus.OK);
     }
