@@ -1,5 +1,7 @@
 package com.marcinfriedrich.planningpoker.payload;
 
+import com.marcinfriedrich.planningpoker.enums.RoomType;
+
 public class KeyResponse {
 
     private String roomKey;
@@ -7,13 +9,16 @@ public class KeyResponse {
     private String roomName;
     private String userName;
     private Boolean observer;
+    private RoomType roomType;
 
-    public KeyResponse(String roomKey, String userKey, String roomName, String userName, Boolean observer) {
+    public KeyResponse(String roomKey, String userKey, String roomName,
+                       String userName, Boolean observer, RoomType roomType) {
         this.roomKey = roomKey;
         this.userKey = userKey;
         this.roomName = roomName;
         this.userName = userName;
         this.observer = observer;
+        this.roomType = roomType;
     }
 
     public String getRoomKey() {
@@ -54,5 +59,13 @@ public class KeyResponse {
 
     public void setObserver(Boolean isObserver) {
         this.observer = isObserver;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
 }

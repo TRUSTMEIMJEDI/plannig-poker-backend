@@ -82,13 +82,17 @@ public class RoomController {
                 .collect(Collectors.toList());
         template.convertAndSend("/room/" + key, users);
 
-        return new ResponseEntity<>(new KeyResponse(key, user.getKey(), room.getName(), name, isObserver), HttpStatus.OK);
+        return new ResponseEntity<>(new KeyResponse(key, user.getKey(), room.getName(),
+                name, isObserver, room.getRoomType()), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping("/createRoomWithOwner")
     public KeyResponse createRoom(@RequestBody CreateRoomRequest roomRequest) {
-        return roomCacheManager.createRoom(roomRequest.getRoomName(), roomRequest.getUserName());
+        return roomCacheManager.createRoom(
+                roomRequest.getRoomName(),
+                roomRequest.getUserName(),
+                roomRequest.getRoomType());
     }
 
     @CrossOrigin(origins = "*")

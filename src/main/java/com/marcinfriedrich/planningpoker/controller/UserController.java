@@ -43,7 +43,8 @@ public class UserController {
         List<UserAnswerResponse> users = getUserAnswerResponses(room);
         template.convertAndSend("/room/" + roomKey, users);
 
-        return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(), user.getName(), isObserver), HttpStatus.OK);
+        return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(),
+                user.getName(), isObserver, room.getRoomType()), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
@@ -63,7 +64,8 @@ public class UserController {
         List<UserAnswerResponse> users = getUserAnswerResponses(room);
         template.convertAndSend("/room/" + roomKey, users);
 
-        return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(), user.getName(), user.isObserver()), HttpStatus.OK);
+        return new ResponseEntity<>(new KeyResponse(roomKey, user.getKey(), room.getName(),
+                user.getName(), user.isObserver(), room.getRoomType()), HttpStatus.OK);
     }
 
     private List<UserAnswerResponse> getUserAnswerResponses(Room room) {
