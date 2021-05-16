@@ -1,5 +1,6 @@
 package com.marcinfriedrich.planningpoker.model;
 
+import com.marcinfriedrich.planningpoker.enums.RoomType;
 import com.marcinfriedrich.planningpoker.util.RandomUtil;
 
 import java.time.LocalDate;
@@ -12,12 +13,14 @@ public class Room {
     private final String key;
     private final List<User> users;
     private final LocalDate createdAt;
+    private final RoomType roomType;
 
-    public Room(String name) {
+    public Room(String name, RoomType roomType) {
         this.name = name;
         this.users = new ArrayList<>();
         this.key = RandomUtil.generateRoomKey();
         this.createdAt = LocalDate.now();
+        this.roomType = roomType;
     }
 
     public void addUser(User user) {
@@ -70,5 +73,9 @@ public class Room {
 
     public LocalDate getCreatedAt() {
         return createdAt;
+    }
+
+    public RoomType getRoomType() {
+        return roomType;
     }
 }

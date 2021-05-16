@@ -1,5 +1,6 @@
 package com.marcinfriedrich.planningpoker.cache;
 
+import com.marcinfriedrich.planningpoker.enums.RoomType;
 import com.marcinfriedrich.planningpoker.enums.Size;
 import com.marcinfriedrich.planningpoker.exception.NameIsTakenException;
 import com.marcinfriedrich.planningpoker.exception.NoRoomException;
@@ -37,8 +38,8 @@ public class RoomCacheManager {
         return rooms;
     }
 
-    public synchronized KeyResponse createRoom(String roomName, String userName) {
-        Room room = new Room(roomName);
+    public synchronized KeyResponse createRoom(String roomName, String userName, RoomType roomType) {
+        Room room = new Room(roomName, roomType);
         User user = new User(userName);
         user.setOwner(true);
         room.addUser(user);
@@ -47,7 +48,7 @@ public class RoomCacheManager {
         String userKey = user.getKey();
         cache.put(roomKey, room);
 
-        return new KeyResponse(roomKey, userKey, roomName, userName, false);
+        return new KeyResponse(roomKey, userKey, roomName, userName, false, roomType);
     }
 
     public synchronized Room getRoom(String key) {
