@@ -1,6 +1,7 @@
 package com.marcinfriedrich.planningpoker.controller;
 
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
+import com.marcinfriedrich.planningpoker.enums.RoomType;
 import com.marcinfriedrich.planningpoker.exception.ErrorResponse;
 import com.marcinfriedrich.planningpoker.exception.JsonExceptionHandler;
 import com.marcinfriedrich.planningpoker.model.Room;
@@ -13,6 +14,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -155,6 +158,16 @@ public class RoomController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @CrossOrigin(origins = "*")
+    @PostMapping("/changeRoomType")
+    public ResponseEntity<?> changeRoomType(@RequestBody ChangeRoomTypeRequest changeRoomTypeRequest) {
+        String roomKey = changeRoomTypeRequest.getRoomKey();
+        String roomType = changeRoomTypeRequest.getRoomType();
+        roomCacheManager.changeRoomType(roomKey, RoomType.valueOf(roomType));
+        template.convertAndSend("/room/" + roomKey + "/changeType", roomType);
+      return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     @Scheduled(cron = "0 0 16 * * MON-FRI")
     public void removeUnusedRooms() {
         List<Room> rooms = roomCacheManager.getRooms();
@@ -164,21 +177,5 @@ public class RoomController {
                 .collect(Collectors.toList());
         rooms.forEach(room -> roomCacheManager.deleteRoom(room.getKey()));
     }
-
-//    @GetMapping("/createRoom/{name}")
-//    public String addUserToRoom(@PathVariable String name) {
-//        return roomCacheManager.createRoom(name);
-//    }
-
-//    @DeleteMapping("/{key}/owner/{name}")
-//    public void deleteRoom(@PathVariable String key, @PathVariable String name) {
-//        roomCacheManager.deleteRoom(key, name);
-//    }
-
-//    @GetMapping("/createRoom/{name}")
-//    public RedirectView addUserToRoom(@PathVariable String name) {
-//        roomCacheManager.createRoom(name);
-//        return new RedirectView("http://localhost:4200/room");
-//    }
 
 }

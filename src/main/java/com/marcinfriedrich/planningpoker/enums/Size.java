@@ -19,5 +19,9 @@ public enum Size {
     FIB_34,
     FIB_55,
     FIB_89,
-    QUESTION
+    QUESTION,
+    MOSCOW_M,
+    MOSCOW_S,
+    MOSCOW_C,
+    MOSCOW_W
 }

@@ -31,9 +31,7 @@ public class RoomCacheManager {
 
     public synchronized List<Room> getRooms() {
         List<Room> rooms = new ArrayList<>();
-        cache.forEach((key, val) -> {
-            rooms.add((Room) val);
-        });
+        cache.forEach((key, val) -> rooms.add((Room) val));
 
         return rooms;
     }
@@ -53,6 +51,11 @@ public class RoomCacheManager {
 
     public synchronized Room getRoom(String key) {
         return (Room) cache.get(key);
+    }
+
+    public synchronized void changeRoomType(String key, RoomType roomType) {
+        Room room = (Room) cache.get(key);
+        room.setRoomType(roomType);
     }
 
     public synchronized Room joinRoom(String key, User user) throws NameIsTakenException, NoRoomException {

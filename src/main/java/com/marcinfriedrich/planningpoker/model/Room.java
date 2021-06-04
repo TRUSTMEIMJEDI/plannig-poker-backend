@@ -6,14 +6,13 @@ import com.marcinfriedrich.planningpoker.util.RandomUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class Room {
     private final String name;
     private final String key;
     private final List<User> users;
     private final LocalDate createdAt;
-    private final RoomType roomType;
+    private RoomType roomType;
 
     public Room(String name, RoomType roomType) {
         this.name = name;
@@ -78,4 +77,9 @@ public class Room {
     public RoomType getRoomType() {
         return roomType;
     }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
 }
