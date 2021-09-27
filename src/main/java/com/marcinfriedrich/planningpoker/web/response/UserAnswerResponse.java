@@ -1,29 +1,17 @@
 package com.marcinfriedrich.planningpoker.web.response;
 
 import com.marcinfriedrich.planningpoker.domain.User;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 
+@Value(staticConstructor = "of")
+@EqualsAndHashCode
 public class UserAnswerResponse {
+    String name;
+    boolean answered;
+    boolean observer;
 
-    private final String name;
-    private final boolean answered;
-    private final boolean observer;
-
-    public UserAnswerResponse(User user) {
-        this.name = user.getName();
-        this.answered = user.isAnswered();
-        this.observer = user.isObserver();
+    public static UserAnswerResponse of(User user) {
+        return new UserAnswerResponse(user.getName(), user.isAnswered(), user.isObserver());
     }
-
-    public String getName() {
-        return name;
-    }
-
-    public boolean isAnswered() {
-        return answered;
-    }
-
-    public boolean isObserver() {
-        return observer;
-    }
-
 }

@@ -32,7 +32,7 @@ public class RoomService {
     public List<UserAnswerResponse> getUsersWithHiddenAnswersInRoom(String roomId) {
         return getUsersInRoom(roomId)
                 .stream()
-                .map(UserAnswerResponse::new)
+                .map(UserAnswerResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -43,7 +43,7 @@ public class RoomService {
     public void revealAnswersForRoom(String roomId) {
         final var userFullResponses = getUsersInRoom(roomId)
                 .stream()
-                .map(UserFullResponse::new)
+                .map(UserFullResponse::of)
                 .collect(Collectors.toList());
         template.convertAndSend("/room/" + roomId + "/reveal", userFullResponses);
     }
@@ -53,7 +53,7 @@ public class RoomService {
         room.cleanAnswers();
         final var userFullResponses = room.getUsers()
                 .stream()
-                .map(UserFullResponse::new)
+                .map(UserFullResponse::of)
                 .collect(Collectors.toList());
         template.convertAndSend("/room/" + roomId + "/reveal", userFullResponses);
     }
@@ -87,7 +87,7 @@ public class RoomService {
         room.setUserAnswer(userId, size);
         var userAnswerResponses = room.getUsers()
                 .stream()
-                .map(UserAnswerResponse::new)
+                .map(UserAnswerResponse::of)
                 .collect(Collectors.toList());
         template.convertAndSend("/room/" + roomId, userAnswerResponses);
     }
@@ -119,7 +119,7 @@ public class RoomService {
         }
 
         var userAnswerResponses = room.getUsers().stream()
-                .map(UserAnswerResponse::new)
+                .map(UserAnswerResponse::of)
                 .collect(Collectors.toList());
         this.template.convertAndSend("/room/" + roomId, userAnswerResponses);
         this.template.convertAndSend("/room/" + roomId + "/" + userNameToDelete, userNameToDelete);
@@ -168,7 +168,7 @@ public class RoomService {
 
     private List<UserAnswerResponse> getUserAnswerResponses(Room room) {
         return room.getUsers().stream()
-                .map(UserAnswerResponse::new)
+                .map(UserAnswerResponse::of)
                 .collect(Collectors.toList());
     }
 }
