@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-public class RoomController {
+class RoomController {
 
     private final SimpMessagingTemplate template;
     private final RoomCacheManager roomCacheManager;

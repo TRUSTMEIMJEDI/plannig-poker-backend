@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api")
-public class UserController {
+class UserController {
 
     private final SimpMessagingTemplate template;
     private final RoomCacheManager roomCacheManager;
@@ -30,7 +30,9 @@ public class UserController {
     }
 
     @PutMapping("/{roomKey}/{userKey}/{isObserver}")
-    public ResponseEntity<KeyResponse> changeUserType(@PathVariable String roomKey, @PathVariable String userKey, @PathVariable boolean isObserver) {
+    public ResponseEntity<KeyResponse> changeUserType(@PathVariable String roomKey, 
+                                                      @PathVariable String userKey,
+                                                      @PathVariable boolean isObserver) {
         Room room = roomCacheManager.getRoom(roomKey);
         User user = room.getUserByKey(userKey);
         user.setObserver(isObserver);

@@ -1,7 +1,9 @@
 package com.marcinfriedrich.planningpoker.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marcinfriedrich.planningpoker.cache.RoomCacheManager;
 import com.marcinfriedrich.planningpoker.model.Room;
+import lombok.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-public class AdminController {
+class AdminController {
 
     private final RoomCacheManager roomCacheManager;
     private final SimpMessagingTemplate template;
@@ -68,25 +70,13 @@ public class AdminController {
         }
     }
 
-}
+    @Value
+    static class LoginRequest {
+        @JsonProperty
+        String password;
 
-class LoginRequest {
-    private String password;
-    private String roomKey;
-
-    public String getPassword() {
-        return password;
+        @JsonProperty
+        String roomKey;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRoomKey() {
-        return roomKey;
-    }
-
-    public void setRoomKey(String roomKey) {
-        this.roomKey = roomKey;
-    }
 }
