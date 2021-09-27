@@ -29,7 +29,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final Clock clock;
 
-    public List<UserAnswerResponse> getUsersWithHiddenAnswersFromRoom(String roomId) {
+    public List<UserAnswerResponse> getUsersWithHiddenAnswersInRoom(String roomId) {
         return getUsersInRoom(roomId)
                 .stream()
                 .map(UserAnswerResponse::new)
@@ -48,7 +48,7 @@ public class RoomService {
         template.convertAndSend("/room/" + roomId + "/reveal", userFullResponses);
     }
 
-    public void cleanAnswersForRoom(String roomId) {
+    public void cleanAnswersInRoom(String roomId) {
         var room = roomRepository.getRoomById(roomId);
         room.cleanAnswers();
         final var userFullResponses = room.getUsers()

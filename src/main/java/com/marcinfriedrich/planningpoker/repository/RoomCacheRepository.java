@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class RoomCacheRepository implements RoomRepository {
+class RoomCacheRepository implements RoomRepository {
     private final Map<String, Room> roomCache = new ConcurrentHashMap<>();
 
     @Override

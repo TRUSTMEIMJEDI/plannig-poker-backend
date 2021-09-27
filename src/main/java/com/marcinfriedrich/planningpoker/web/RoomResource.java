@@ -26,7 +26,7 @@ class RoomResource {
 
     @GetMapping("/{key}/users")
     public List<UserAnswerResponse> getUsersFromRoom(@PathVariable(name = "key") String roomId) {
-        return roomService.getUsersWithHiddenAnswersFromRoom(roomId);
+        return roomService.getUsersWithHiddenAnswersInRoom(roomId);
     }
 
     @GetMapping("/{key}/reveal")
@@ -36,7 +36,7 @@ class RoomResource {
 
     @GetMapping("/{key}/clean")
     public void clean(@PathVariable(name = "key") String roomId) {
-        roomService.cleanAnswersForRoom(roomId);
+        roomService.cleanAnswersInRoom(roomId);
     }
 
     @PostMapping("/{key}/{name}/{isObserver}")
