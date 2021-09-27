@@ -1,79 +1,56 @@
 package com.marcinfriedrich.planningpoker.service;
 
 import com.marcinfriedrich.planningpoker.ClockTestConfig;
+import com.marcinfriedrich.planningpoker.IntegrationTest;
 import com.marcinfriedrich.planningpoker.domain.Room;
 import com.marcinfriedrich.planningpoker.domain.RoomType;
 import com.marcinfriedrich.planningpoker.domain.User;
 import com.marcinfriedrich.planningpoker.repository.RoomRepository;
 import com.marcinfriedrich.planningpoker.web.response.UserAnswerResponse;
 import com.marcinfriedrich.planningpoker.web.response.UserFullResponse;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-// IT or Mock tests ???
-//public class RoomServiceTests extends IntegrationTest {
-//}
+@Import(ClockTestConfig.class)
+class RoomServiceIT extends IntegrationTest {
 
-//@Import(ClockTestConfig.class)
-@ExtendWith(MockitoExtension.class)
-class RoomServiceTests {
+    public static final String OWNER_NAME = "owner";
 
-//    public static final String ROOM_ID = "K5tTd";
-//    private static final Instant CREATED_AT = Instant.parse("2021-07-24T12:00:00.000Z");
-//
-//    @Mock
-//    private SimpMessagingTemplate template;
-//
-//    @Mock
-//    private RoomRepository roomRepository;
-//
-//    @Autowired
-//    private ClockTestConfig.FixedClock clock;
-//
-//    private RoomService roomService;
-//
-//    @BeforeEach
-//    void setUp() {
-//        roomService = new RoomService(template, roomRepository, clock);
-//    }
+    private final SimpMessagingTemplate template;
+    private final RoomRepository roomRepository;
+    private final ClockTestConfig.FixedClock clock;
+    private final RoomService roomService;
 
-    @Mock
-    private SimpMessagingTemplate template;
-
-    @Mock
-    private RoomRepository roomRepository;
-
-    @Mock
-    private ClockTestConfig.FixedClock clock;
-
-    @InjectMocks
-    private RoomService roomService;
+    @Autowired
+    public RoomServiceIT(SimpMessagingTemplate template,
+                         RoomRepository roomRepository,
+                         ClockTestConfig.FixedClock clock,
+                         RoomService roomService) {
+        this.template = template;
+        this.roomRepository = roomRepository;
+        this.clock = clock;
+        this.roomService = roomService;
+    }
 
     @Test
     @DisplayName("should get users with hidden answers from room")
     void shouldGetUsersWithHiddenAnswersFromRoom() {
         // given
-        Room room = aRoomWithUsers();
-
-        given(roomRepository.getRoomById(room.getId()))
-                .willReturn(room);
+        Room room = givenRoomWithUserNames("user1", "user2");
 
         // when
-        final var users = roomService.getUsersWithHiddenAnswersFromRoom(room.getId());
+        final var users = roomService.getUsersWithHiddenAnswersInRoom(room.getId());
 
         // then
         assertThat(users)
@@ -83,9 +60,9 @@ class RoomServiceTests {
                         UserAnswerResponse::isAnswered,
                         UserAnswerResponse::isObserver)
                 .contains(
-                        tuple("owner", false, false),
-                        tuple("testUser1", false, false),
-                        tuple("testUser2", false, false)
+                        tuple(OWNER_NAME, false, false),
+                        tuple("user1", false, false),
+                        tuple("user2", false, false)
                 );
     }
 
@@ -93,9 +70,7 @@ class RoomServiceTests {
     @DisplayName("should get users in room")
     void shouldGetUsersInRoom() {
         // given
-        Room room = aRoomWithUsers();
-        given(roomRepository.getRoomById(room.getId()))
-                .willReturn(room);
+        Room room = givenRoomWithUserNames("testUser1", "testUser2");
 
         // when
         final var users = roomService.getUsersInRoom(room.getId());
@@ -110,23 +85,23 @@ class RoomServiceTests {
                         User::isAnswered,
                         User::getSize)
                 .contains(
-                        tuple("owner", true, false, false, null),
+                        tuple(OWNER_NAME, true, false, false, null),
                         tuple("testUser1", false, false, false, null),
                         tuple("testUser2", false, false, false, null)
                 );
     }
 
     @Test
+    @Disabled
     @DisplayName("should reveal answers for the room")
     void revealAnswersForRoom() {
         // given
-        Room room = aRoomWithUsers();
-        given(roomRepository.getRoomById(room.getId()))
-                .willReturn(room);
+        Room room = givenRoomWithUserNames("testUser1", "testUser2");
+
         final var messageDestination = "/room/" + room.getId() + "/reveal";
         final var userFullResponses = room.getUsers()
                 .stream()
-                .map(UserFullResponse::new)
+                .map(UserFullResponse::of)
                 .collect(Collectors.toList());
 
         // when
@@ -135,6 +110,7 @@ class RoomServiceTests {
         // then
         verify(template, times(1))
                 .convertAndSend(messageDestination, userFullResponses);
+
 //        await().atMost(5, TimeUnit.SECONDS)
 //                .untilAsserted(() -> verify(template, times(1))
 //                        .convertAndSend(messageDestination, userFullResponses));
@@ -144,16 +120,7 @@ class RoomServiceTests {
     @DisplayName("should create room with owner")
     void shouldCreateRoom() {
         // given
-        User owner = User.of("owner", false);
-        Room room = Room.builder()
-                .name("testRoom")
-                .owner(owner)
-                .roomType(RoomType.T_SHIRTS)
-                .createdAt(clock.getCurrentDate())
-                .build();
-
-        given(roomRepository.addRoom(any()))
-                .willReturn(room);
+        User owner = User.of(OWNER_NAME, false);
 
         // when
         final var actualRoom = roomService.createRoom("testRoom", owner, RoomType.T_SHIRTS);
@@ -161,28 +128,27 @@ class RoomServiceTests {
         // then
         assertThat(actualRoom)
                 .extracting(
-                        Room::getId,
                         Room::getName,
                         Room::getOwner,
                         Room::getCreatedAt,
                         Room::getRoomType)
                 .contains(
-                        room.getId(),
-                        room.getName(),
-                        room.getOwner(),
-                        room.getCreatedAt(),
-                        room.getRoomType()
+                        "testRoom",
+                        owner,
+                        clock.getCurrentDate(),
+                        RoomType.T_SHIRTS
                 );
     }
 
-    private Room aRoomWithUsers() {
-        Room room = aRoomWithOwner(User.of("owner", false));
-        room.addUserToRoom(User.of("testUser1", false));
-        room.addUserToRoom(User.of("testUser2", false));
-        return room;
+    private Room givenRoomWithUserNames(String... values) {
+        Room room = givenRoomWithOwner(User.of(OWNER_NAME, false));
+        for (String value : values) {
+            room.addUserToRoom(User.of(value, false));
+        }
+        return roomRepository.addRoom(room);
     }
 
-    private Room aRoomWithOwner(User owner) {
+    private Room givenRoomWithOwner(User owner) {
         return Room.builder()
                 .name("roomTest")
                 .owner(owner)
