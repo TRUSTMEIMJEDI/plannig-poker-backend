@@ -1,10 +1,16 @@
 package com.marcinfriedrich.planningpoker.web.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class DeleteUserFromRoom extends RoomAndUserRequest {
-    private String userNameToDelete;
+@Value
+public class DeleteUserFromRoom {
+    @JsonProperty
+    String roomKey;
+
+    @JsonProperty
+    String userKey;
+
+    @JsonProperty
+    String userNameToDelete;
 }

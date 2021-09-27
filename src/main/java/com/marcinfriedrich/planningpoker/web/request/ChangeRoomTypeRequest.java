@@ -2,14 +2,14 @@ package com.marcinfriedrich.planningpoker.web.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marcinfriedrich.planningpoker.domain.RoomType;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class ChangeRoomTypeRequest {
 
     @JsonProperty
-    private String roomKey;
+    String roomKey;
 
     @JsonProperty
-    private RoomType roomType;
+    RoomType roomType;
 }

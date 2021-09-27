@@ -2,32 +2,28 @@ package com.marcinfriedrich.planningpoker.web.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.marcinfriedrich.planningpoker.domain.RoomType;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class KeyResponse {
 
     @JsonProperty("roomKey")
-    private String roomId;
+    String roomId;
 
     @JsonProperty("userKey")
-    private String userId;
+    String userId;
 
     @JsonProperty
-    private String roomName;
+    String roomName;
 
     @JsonProperty
-    private String userName;
+    String userName;
 
     @JsonProperty
-    private Boolean observer;
+    Boolean observer;
 
     @JsonProperty
-    private RoomType roomType;
+    RoomType roomType;
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class RoomResource {
+class RoomResource {
 
     private final RoomService roomService;
 

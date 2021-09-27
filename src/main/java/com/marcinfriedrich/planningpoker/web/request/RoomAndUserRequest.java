@@ -1,14 +1,14 @@
 package com.marcinfriedrich.planningpoker.web.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class RoomAndUserRequest {
 
     @JsonProperty
-    private String roomKey;
+    String roomKey;
 
     @JsonProperty
-    private String userKey;
+    String userKey;
 }
